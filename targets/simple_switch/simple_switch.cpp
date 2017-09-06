@@ -55,12 +55,24 @@ struct bmv2_hash {
   }
 };
 
+struct multi_path_hash {
+  uint32_t operator()(const char *buf, size_t s) const {
+    uint32_t hash = 0;
+
+    for (size_t i = 0; i < s; i++) {
+      hash = hash | buf[i];
+    }
+    return static_cast<uint32_t>(hash);
+  }
+};
+
 }  // namespace
 
 // if REGISTER_HASH calls placed in the anonymous namespace, some compiler can
 // give an unused variable warning
 REGISTER_HASH(hash_ex);
 REGISTER_HASH(bmv2_hash);
+REGISTER_HASH(multi_path_hash);
 
 extern int import_primitives();
 
