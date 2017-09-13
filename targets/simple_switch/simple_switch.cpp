@@ -88,7 +88,7 @@ struct multi_path_probability_hash {
       }
     }
 
-    return static_cast<uint32_t>(0) 
+    return static_cast<uint32_t>(0);
   }
 };
 
