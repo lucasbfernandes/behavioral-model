@@ -23,6 +23,7 @@
 #include <bm/SimpleSwitch.h>
 #include <bm/bm_runtime/bm_runtime.h>
 #include <bm/bm_sim/target_parser.h>
+#include <time.h>
 
 #include "simple_switch.h"
 
@@ -37,6 +38,8 @@ shared_ptr<SimpleSwitchIf> get_handler(SimpleSwitch *sw);
 
 int
 main(int argc, char* argv[]) {
+  srand(time(NULL));
+
   simple_switch = new SimpleSwitch();
   simple_switch_parser = new bm::TargetParserBasic();
   simple_switch_parser->add_flag_option("enable-swap",

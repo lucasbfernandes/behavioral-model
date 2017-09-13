@@ -27,6 +27,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 
 #include "simple_switch.h"
 
@@ -55,7 +56,7 @@ struct bmv2_hash {
   }
 };
 
-struct multi_path_hash {
+struct multi_path_simple_hash {
   uint32_t operator()(const char *buf, size_t s) const {
     uint32_t hash = 0;
 
@@ -66,13 +67,39 @@ struct multi_path_hash {
   }
 };
 
+struct multi_path_probability_hash {
+  uint32_t operator()(const char *buf, size_t s) const {
+    uint32_t probability,
+             random,
+             probabilitySum = 0;
+    std::vector<uint32_t> probabilityArray;
+
+    for (size_t i = 0; i < s; i++) {
+      probability = 0 | buf[i];
+      probabilitySum += probability;
+      probabilityArray.push_back(probabilitySum);
+    }
+
+    random = rand() % probabilitySum;
+
+    for (size_t i = 0; i < probabilityArray.size(); i++) {
+      if (random < probabilityArray[i]) {
+        return static_cast<uint32_t>(i);
+      }
+    }
+
+    return static_cast<uint32_t>(0) 
+  }
+};
+
 }  // namespace
 
 // if REGISTER_HASH calls placed in the anonymous namespace, some compiler can
 // give an unused variable warning
 REGISTER_HASH(hash_ex);
 REGISTER_HASH(bmv2_hash);
-REGISTER_HASH(multi_path_hash);
+REGISTER_HASH(multi_path_simple_hash);
+REGISTER_HASH(multi_path_probability_hash);
 
 extern int import_primitives();
 
