@@ -28,6 +28,8 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <map>
+#include <utility>
 
 #include "simple_switch.h"
 
@@ -92,6 +94,26 @@ struct multi_path_probability_hash {
   }
 };
 
+std::map<std::string, std::pair<uint32_t, uint32_t>> stateMap;
+
+void updateRoundRobinStateMap(std::string ipAddress, uint32_t pathsCount) {
+  if (!stateMap.count(ipAddress)) {
+    stateMap[ipAddress] = std::make_pair(0, pathsCount);
+  }
+  else {
+    stateMap[ipAddress].first = (stateMap[ipAddress].first + 1) % stateMap[ipAddress].second;
+  }
+}
+
+struct multi_path_roundrobin_hash {
+  uint32_t operator()(const char *buf, size_t s) const {
+    std::string ipAddress(buf, 4);
+    uint32_t pathsCount = s - 4;
+    updateRoundRobinStateMap(ipAddress, pathsCount);
+    return static_cast<uint32_t>(stateMap[ipAddress].first);
+  }
+};
+
 }  // namespace
 
 // if REGISTER_HASH calls placed in the anonymous namespace, some compiler can
@@ -100,6 +122,7 @@ REGISTER_HASH(hash_ex);
 REGISTER_HASH(bmv2_hash);
 REGISTER_HASH(multi_path_simple_hash);
 REGISTER_HASH(multi_path_probability_hash);
+REGISTER_HASH(multi_path_roundrobin_hash);
 
 extern int import_primitives();
 
