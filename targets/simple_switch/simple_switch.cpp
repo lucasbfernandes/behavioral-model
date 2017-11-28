@@ -96,16 +96,20 @@ struct multi_path_probability_hash {
 
 std::map<std::string, std::pair<uint32_t, uint32_t>> stateMap;
 
-void setRoutePath(std::string routeId, uint32_t pathsNumber) {
-  stateMap[routeId] = !stateMap.count(routeId) ? std::make_pair(0, pathsNumber) : std::make_pair((stateMap[routeId].first + 1) % stateMap[routeId].second, pathsNumber);
+uint32_t getRoutePath(std::string routeId, uint32_t pathsNumber) {
+  uint32_t defaultRoute = 0;
+  stateMap[routeId] = !stateMap.count(routeId) ?
+    std::make_pair(defaultRoute, pathsNumber) :
+    std::make_pair((stateMap[routeId].first + 1) % stateMap[routeId].second, pathsNumber);
+
+  return stateMap[routeId].first;
 }
 
 struct multi_path_roundrobin_hash {
   uint32_t operator()(const char *buf, size_t s) const {
     std::string routeId(buf, 8);
     uint32_t pathsNumber = 0 | buf[8];
-    setRoutePath(routeId, pathsNumber);
-    return static_cast<uint32_t>(stateMap[routeId].first);
+    return setRoutePath(routeId, pathsNumber);
   }
 };
 
