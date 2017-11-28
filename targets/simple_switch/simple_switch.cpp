@@ -108,8 +108,8 @@ uint32_t getRoutePath(std::string routeId, uint32_t pathsNumber) {
 struct multi_path_roundrobin_hash {
   uint32_t operator()(const char *buf, size_t s) const {
     std::string routeId(buf, 8);
-    uint32_t pathsNumber = 0 | buf[8];
-    return setRoutePath(routeId, pathsNumber);
+    uint32_t pathsNumber = 0 | buf[s - 1];
+    return getRoutePath(routeId, pathsNumber);
   }
 };
 
