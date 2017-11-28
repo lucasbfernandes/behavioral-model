@@ -96,21 +96,16 @@ struct multi_path_probability_hash {
 
 std::map<std::string, std::pair<uint32_t, uint32_t>> stateMap;
 
-void updateRoundRobinStateMap(std::string ipAddress, uint32_t pathsCount) {
-  if (!stateMap.count(ipAddress)) {
-    stateMap[ipAddress] = std::make_pair(0, pathsCount);
-  }
-  else {
-    stateMap[ipAddress].first = (stateMap[ipAddress].first + 1) % stateMap[ipAddress].second;
-  }
+void setRoutePath(std::string routeId, uint32_t pathsNumber) {
+  stateMap[routeId] = !stateMap.count(routeId) ? std::make_pair(0, pathsNumber) : std::make_pair((stateMap[routeId].first + 1) % stateMap[routeId].second, pathsNumber);
 }
 
 struct multi_path_roundrobin_hash {
   uint32_t operator()(const char *buf, size_t s) const {
-    std::string ipAddress(buf, 4);
-    uint32_t pathsCount = s - 4;
-    updateRoundRobinStateMap(ipAddress, pathsCount);
-    return static_cast<uint32_t>(stateMap[ipAddress].first);
+    std::string routeId(buf, 8);
+    uint32_t pathsNumber = 0 | buf[8];
+    setRoutePath(routeId, pathsNumber);
+    return static_cast<uint32_t>(stateMap[routeId].first);
   }
 };
 
