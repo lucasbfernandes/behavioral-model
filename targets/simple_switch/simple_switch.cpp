@@ -79,8 +79,11 @@ uint32_t get_probability_sum(const char *buf, size_t s) {
 
 uint32_t get_probability_path(const char *buf, size_t s, uint32_t random) {
   uint32_t default_route = 0;
+  uint32_t accum = 0.0;
+
   for (size_t i = 0; i < s; i++) {
-    if (random < static_cast<uint32_t>(0 | buf[i])) {
+    accum += 0 | buf[i];
+    if (random < accum) {
       default_route = static_cast<uint32_t>(i);
       break;
     }
