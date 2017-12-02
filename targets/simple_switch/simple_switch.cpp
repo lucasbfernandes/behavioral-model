@@ -71,22 +71,20 @@ struct multi_path_simple_hash {
 
 struct multi_path_probability_hash {
   uint32_t operator()(const char *buf, size_t s) const {
-    uint32_t probability,
-             random,
-             probabilitySum = 0;
-    std::vector<uint32_t> probabilityArray;
+    uint32_t probability_sum = 0;
+    std::vector<uint32_t> probability_array;
 
     for (size_t i = 0; i < s; i++) {
-      probability = 0 | buf[i];
-      probabilitySum += probability;
-      probabilityArray.push_back(probabilitySum);
+      uint32_t probability = 0 | buf[i];
+      probability_sum += probability;
+      probability_array.push_back(probability_sum);
     }
 
-    random = rand() % probabilitySum;
+    uint32_t random = rand() % probability_sum;
 
-    for (size_t i = 0; i < probabilityArray.size(); i++) {
-      if (random < probabilityArray[i]) {
-        return static_cast<uint32_t>(i);
+    for (size_t i = 0; i < probability_array.size(); i++) {
+      if (random < probability_array[i]) {
+        return static_cast<uint32_t>(i + 1);
       }
     }
 
@@ -94,22 +92,22 @@ struct multi_path_probability_hash {
   }
 };
 
-std::map<std::string, std::pair<uint32_t, uint32_t>> stateMap;
+std::map<std::string, std::pair<uint32_t, uint32_t>> state_map;
 
-uint32_t getRoutePath(std::string routeId, uint32_t pathsNumber) {
-  uint32_t defaultRoute = 0;
-  stateMap[routeId] = !stateMap.count(routeId) ?
-    std::make_pair(defaultRoute, pathsNumber) :
-    std::make_pair((stateMap[routeId].first + 1) % stateMap[routeId].second, pathsNumber);
+uint32_t get_route_path(std::string route_id, uint32_t paths_number) {
+  uint32_t default_route = 0;
+  state_map[route_id] = !state_map.count(route_id) ?
+    std::make_pair(default_route, paths_number) :
+    std::make_pair((state_map[route_id].first + 1) % state_map[route_id].second, paths_number);
 
-  return stateMap[routeId].first;
+  return state_map[route_id].first;
 }
 
 struct multi_path_roundrobin_hash {
   uint32_t operator()(const char *buf, size_t s) const {
-    std::string routeId(buf, 8);
-    uint32_t pathsNumber = 0 | buf[s - 1];
-    return getRoutePath(routeId, pathsNumber);
+    std::string route_id(buf, 8);
+    uint32_t paths_number = 0 | buf[s - 1];
+    return get_route_path(route_id, paths_number);
   }
 };
 
