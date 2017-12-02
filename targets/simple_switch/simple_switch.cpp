@@ -91,9 +91,15 @@ uint32_t get_probability_path(const char *buf, size_t max_paths, uint32_t random
   return path;
 }
 
+uint32_t get_probability_max_paths(const char *buf, size_t s) {
+  uint32_t array_max = static_cast<uint32_t>(s - 1);
+  uint32_t meta_max = static_cast<uint32_t>(0 | buf[0]);
+  return array_max < meta_max ? array_max : meta_max;
+}
+
 struct probability_multipath {
   uint32_t operator()(const char *buf, size_t s) const {
-    uint32_t max_paths = static_cast<uint32_t>(std::min(0 | buf[0], s - 1));
+    uint32_t max_paths = get_probability_max_paths(buf, s);
     uint32_t probability_sum = get_probability_sum(buf, max_paths);
     uint32_t random = rand() % probability_sum;
     return get_probability_path(buf, max_paths, random);
