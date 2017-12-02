@@ -77,14 +77,14 @@ uint32_t get_probability_sum(const char *buf, size_t max_paths) {
   return probability_sum;
 }
 
-uint32_t get_probability_path(const char *buf, size_t max_paths, uint32_t random) {
+uint32_t get_probability_path(const char *buf, uint32_t max_paths, uint32_t random) {
   uint32_t path = 0;
   uint32_t accum = 0.0;
 
   for (size_t i = 1; i < max_paths; i++) {
     accum += 0 | buf[i];
     if (random < accum) {
-      path = static_cast<uint32_t>(i);
+      path = static_cast<uint32_t>(i - 1);
       break;
     }
   }
