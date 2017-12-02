@@ -69,32 +69,36 @@ struct multi_path_simple_hash {
   }
 };
 
-struct multi_path_probability_hash {
+uint32_t get_probability_sum(const char *buf, size_t s) {
+  uint32_t probability_sum = 0;
+  for (size_t i = 0; i < s; i++) {
+    probability_sum += 0 | buf[i];
+  }
+  return probability_sum;
+}
+
+uint32_t get_probability_path(const char *buf, size_t s, uint32_t random) {
+  uint32_t default_route = 0;
+  for (size_t i = 0; i < s; i++) {
+    if (random < (0 | buf[i])) {
+      default_route = static_cast<uint32_t>(i);
+      break;
+    }
+  }
+  return default_route;
+}
+
+struct probability_multipath {
   uint32_t operator()(const char *buf, size_t s) const {
-    uint32_t probability_sum = 0;
-    std::vector<uint32_t> probability_array;
-
-    for (size_t i = 0; i < s; i++) {
-      uint32_t probability = 0 | buf[i];
-      probability_sum += probability;
-      probability_array.push_back(probability_sum);
-    }
-
+    uint32_t probability_sum = get_probability_sum(buf, s);
     uint32_t random = rand() % probability_sum;
-
-    for (size_t i = 0; i < probability_array.size(); i++) {
-      if (random < probability_array[i]) {
-        return static_cast<uint32_t>(i + 1);
-      }
-    }
-
-    return static_cast<uint32_t>(0);
+    return get_probability_path(buf, s, random);
   }
 };
 
 std::map<std::string, std::pair<uint32_t, uint32_t>> state_map;
 
-uint32_t get_route_path(std::string route_id, uint32_t paths_number) {
+uint32_t get_deterministic_path(std::string route_id, uint32_t paths_number) {
   uint32_t default_route = 0;
   state_map[route_id] = !state_map.count(route_id) ?
     std::make_pair(default_route, paths_number) :
@@ -103,11 +107,11 @@ uint32_t get_route_path(std::string route_id, uint32_t paths_number) {
   return state_map[route_id].first;
 }
 
-struct multi_path_roundrobin_hash {
+struct deterministic_multipath {
   uint32_t operator()(const char *buf, size_t s) const {
     std::string route_id(buf, 8);
     uint32_t paths_number = 0 | buf[s - 1];
-    return get_route_path(route_id, paths_number);
+    return get_deterministic_path(route_id, paths_number);
   }
 };
 
@@ -118,8 +122,8 @@ struct multi_path_roundrobin_hash {
 REGISTER_HASH(hash_ex);
 REGISTER_HASH(bmv2_hash);
 REGISTER_HASH(multi_path_simple_hash);
-REGISTER_HASH(multi_path_probability_hash);
-REGISTER_HASH(multi_path_roundrobin_hash);
+REGISTER_HASH(probability_multipath);
+REGISTER_HASH(deterministic_multipath);
 
 extern int import_primitives();
 
