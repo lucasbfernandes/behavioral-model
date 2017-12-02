@@ -69,33 +69,34 @@ struct multi_path_simple_hash {
   }
 };
 
-uint32_t get_probability_sum(const char *buf, size_t s) {
+uint32_t get_probability_sum(const char *buf, size_t max_paths) {
   uint32_t probability_sum = 0;
-  for (size_t i = 0; i < s; i++) {
+  for (size_t i = 1; i < max_paths; i++) {
     probability_sum += 0 | buf[i];
   }
   return probability_sum;
 }
 
-uint32_t get_probability_path(const char *buf, size_t s, uint32_t random) {
-  uint32_t default_route = 0;
+uint32_t get_probability_path(const char *buf, size_t max_paths, uint32_t random) {
+  uint32_t path = 0;
   uint32_t accum = 0.0;
 
-  for (size_t i = 0; i < s; i++) {
+  for (size_t i = 1; i < max_paths; i++) {
     accum += 0 | buf[i];
     if (random < accum) {
-      default_route = static_cast<uint32_t>(i);
+      path = static_cast<uint32_t>(i);
       break;
     }
   }
-  return default_route;
+  return path;
 }
 
 struct probability_multipath {
   uint32_t operator()(const char *buf, size_t s) const {
-    uint32_t probability_sum = get_probability_sum(buf, s);
+    uint32_t max_paths = static_cast<uint32_t>(std::min(0 | buf[0], s - 1));
+    uint32_t probability_sum = get_probability_sum(buf, max_paths);
     uint32_t random = rand() % probability_sum;
-    return get_probability_path(buf, s, random);
+    return get_probability_path(buf, max_paths, random);
   }
 };
 
