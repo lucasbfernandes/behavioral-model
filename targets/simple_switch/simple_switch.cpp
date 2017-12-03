@@ -69,7 +69,7 @@ struct multi_path_simple_hash {
   }
 };
 
-uint32_t get_probability_sum(const char *buf, size_t max_paths) {
+uint32_t get_probabilistic_simple_sum(const char *buf, size_t max_paths) {
   uint32_t probability_sum = 0;
   for (size_t i = 1; i < max_paths + 1; i++) {
     probability_sum += 0 | buf[i];
@@ -77,7 +77,7 @@ uint32_t get_probability_sum(const char *buf, size_t max_paths) {
   return probability_sum;
 }
 
-uint32_t get_probability_path(const char *buf, uint32_t max_paths, uint32_t random) {
+uint32_t get_probabilistic_simple_path(const char *buf, uint32_t max_paths, uint32_t random) {
   uint32_t path = 0;
   uint32_t accum = 0.0;
 
@@ -91,18 +91,18 @@ uint32_t get_probability_path(const char *buf, uint32_t max_paths, uint32_t rand
   return path;
 }
 
-uint32_t get_probability_max_paths(const char *buf, size_t s) {
+uint32_t get_probabilitic_simple_max_paths(const char *buf, size_t s) {
   uint32_t array_max = static_cast<uint32_t>(s - 1);
   uint32_t meta_max = static_cast<uint32_t>(0 | buf[0]);
   return array_max < meta_max ? array_max : meta_max;
 }
 
-struct probability_multipath {
+struct probabilistic_simple_multipath {
   uint32_t operator()(const char *buf, size_t s) const {
-    uint32_t max_paths = get_probability_max_paths(buf, s);
-    uint32_t probability_sum = get_probability_sum(buf, max_paths);
+    uint32_t max_paths = get_probabilitic_simple_max_paths(buf, s);
+    uint32_t probability_sum = get_probabilistic_simple_sum(buf, max_paths);
     uint32_t random = rand() % probability_sum;
-    return get_probability_path(buf, max_paths, random);
+    return get_probabilistic_simple_path(buf, max_paths, random);
   }
 };
 
@@ -178,7 +178,7 @@ struct deterministic_block_multipath {
 REGISTER_HASH(hash_ex);
 REGISTER_HASH(bmv2_hash);
 REGISTER_HASH(multi_path_simple_hash);
-REGISTER_HASH(probability_multipath);
+REGISTER_HASH(probabilistic_simple_multipath);
 REGISTER_HASH(deterministic_round_multipath);
 REGISTER_HASH(deterministic_block_multipath);
 
