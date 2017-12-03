@@ -106,22 +106,68 @@ struct probability_multipath {
   }
 };
 
-std::map<std::string, std::pair<uint32_t, uint32_t>> state_map;
+std::map<std::string, std::pair<uint32_t, uint32_t>> round_map;
 
-uint32_t get_deterministic_path(std::string route_id, uint32_t paths_number) {
+uint32_t get_deterministic_round_path(std::string route_id, uint32_t paths_number) {
   uint32_t default_route = 0;
-  state_map[route_id] = !state_map.count(route_id) ?
+  round_map[route_id] = !round_map.count(route_id) ?
     std::make_pair(default_route, paths_number) :
-    std::make_pair((state_map[route_id].first + 1) % state_map[route_id].second, paths_number);
+    std::make_pair((round_map[route_id].first + 1) % round_map[route_id].second, paths_number);
 
-  return state_map[route_id].first;
+  return round_map[route_id].first;
 }
 
-struct deterministic_multipath {
+struct deterministic_round_multipath {
   uint32_t operator()(const char *buf, size_t s) const {
     std::string route_id(buf, 8);
     uint32_t paths_number = 0 | buf[s - 1];
-    return get_deterministic_path(route_id, paths_number);
+    return get_deterministic_round_path(route_id, paths_number);
+  }
+};
+
+std::map<std::string, uint32_t> block_map;
+
+uint32_t calculate_deterministic_block_path(const char *buf, std::string route_id) {
+  uint32_t path = 0;
+  uint32_t accum = 0;
+
+  for (size_t i = 3; i < max_paths + 3; i++) {
+    accum += 0 | buf[i];
+    if (block_map[route_id].first < accum) {
+      path = static_cast<uint32_t>(i - 3);
+      break;
+    }
+  }
+  return path;
+}
+
+uint32_t get_deterministic_blocks_num(const char *buf, uint32_t max_paths) {
+  uint32_t accum = 0;
+  for (size_t i = 3; i < max_paths + 3; i++) {
+    accum += 0 | buf[i];
+  }
+  return accum;
+}
+
+uint32_t get_deterministic_block_path(const char *buf, std::string route_id, uint32_t max_paths) {
+  uint32_t blocks_num = get_deterministic_blocks_num(buf, max_paths);
+  block_map[route_id] = !block_map.count(route_id) ?
+    std::make_pair(0, blocks_num) :
+    std::make_pair((block_map[route_id].first + 1) % block_map[route_id].second, blocks_num);
+  return calculate_deterministic_block_path(buf, route_id);
+}
+
+uint32_t get_deterministic_block_max_paths(const char *buf, size_t s) {
+  uint32_t array_max = static_cast<uint32_t>(s - 1);
+  uint32_t meta_max = static_cast<uint32_t>(0 | buf[2]);
+  return array_max < meta_max ? array_max : meta_max;
+}
+
+struct deterministic_block_multipath {
+  uint32_t operator()(const char *buf, size_t s) const {
+    std::string route_id(buf, 8);
+    uint32_t max_paths = get_deterministic_block_max_paths(buf, s);
+    return get_deterministic_block_path(buf, route_id, max_paths);
   }
 };
 
