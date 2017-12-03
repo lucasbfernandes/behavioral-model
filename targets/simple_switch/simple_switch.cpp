@@ -152,7 +152,7 @@ uint32_t get_deterministic_blocks_num(const char *buf, uint32_t max_paths) {
 uint32_t get_deterministic_block_path(const char *buf, std::string route_id, uint32_t max_paths) {
   uint32_t blocks_num = get_deterministic_blocks_num(buf, max_paths);
   block_map[route_id] = !block_map.count(route_id) ?
-    std::make_pair(0, blocks_num) :
+    std::make_pair(static_cast<uint32_t>(0), blocks_num) :
     std::make_pair((block_map[route_id].first + 1) % block_map[route_id].second, blocks_num);
   return calculate_deterministic_block_path(buf, route_id, max_paths);
 }
