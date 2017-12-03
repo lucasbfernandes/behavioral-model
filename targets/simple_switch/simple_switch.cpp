@@ -131,10 +131,10 @@ uint32_t calculate_deterministic_block_path(const char *buf, std::string route_i
   uint32_t path = 0;
   uint32_t accum = 0;
 
-  for (size_t i = 3; i < max_paths + 3; i++) {
+  for (size_t i = 9; i < max_paths + 9; i++) {
     accum += 0 | buf[i];
     if (block_map[route_id].first < accum) {
-      path = static_cast<uint32_t>(i - 3);
+      path = static_cast<uint32_t>(i - 9);
       break;
     }
   }
@@ -143,7 +143,7 @@ uint32_t calculate_deterministic_block_path(const char *buf, std::string route_i
 
 uint32_t get_deterministic_blocks_num(const char *buf, uint32_t max_paths) {
   uint32_t accum = 0;
-  for (size_t i = 3; i < max_paths + 3; i++) {
+  for (size_t i = 9; i < max_paths + 9; i++) {
     accum += 0 | buf[i];
   }
   return accum;
@@ -158,8 +158,8 @@ uint32_t get_deterministic_block_path(const char *buf, std::string route_id, uin
 }
 
 uint32_t get_deterministic_block_max_paths(const char *buf, size_t s) {
-  uint32_t array_max = static_cast<uint32_t>(s - 1);
-  uint32_t meta_max = static_cast<uint32_t>(0 | buf[2]);
+  uint32_t array_max = static_cast<uint32_t>(s - 9);
+  uint32_t meta_max = static_cast<uint32_t>(0 | buf[8]);
   return array_max < meta_max ? array_max : meta_max;
 }
 
