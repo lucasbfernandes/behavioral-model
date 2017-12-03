@@ -125,9 +125,9 @@ struct deterministic_round_multipath {
   }
 };
 
-std::map<std::string, uint32_t> block_map;
+std::map<std::string, std::pair<uint32_t, uint32_t>> block_map;
 
-uint32_t calculate_deterministic_block_path(const char *buf, std::string route_id) {
+uint32_t calculate_deterministic_block_path(const char *buf, std::string route_id, uint32_t max_paths) {
   uint32_t path = 0;
   uint32_t accum = 0;
 
@@ -154,7 +154,7 @@ uint32_t get_deterministic_block_path(const char *buf, std::string route_id, uin
   block_map[route_id] = !block_map.count(route_id) ?
     std::make_pair(0, blocks_num) :
     std::make_pair((block_map[route_id].first + 1) % block_map[route_id].second, blocks_num);
-  return calculate_deterministic_block_path(buf, route_id);
+  return calculate_deterministic_block_path(buf, route_id, max_paths);
 }
 
 uint32_t get_deterministic_block_max_paths(const char *buf, size_t s) {
@@ -179,7 +179,8 @@ REGISTER_HASH(hash_ex);
 REGISTER_HASH(bmv2_hash);
 REGISTER_HASH(multi_path_simple_hash);
 REGISTER_HASH(probability_multipath);
-REGISTER_HASH(deterministic_multipath);
+REGISTER_HASH(deterministic_round_multipath);
+REGISTER_HASH(deterministic_block_multipath);
 
 extern int import_primitives();
 
