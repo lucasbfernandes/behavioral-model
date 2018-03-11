@@ -71,7 +71,7 @@ struct multi_path_simple_hash {
 
 uint32_t get_probabilistic_simple_sum(const char *buf, size_t max_paths) {
   uint32_t probability_sum = 0;
-  for (size_t i = 1; i < max_paths + 1; i++) {
+  for (size_t i = 15; i < max_paths + 15; i++) {
     probability_sum += 0 | buf[i];
   }
   return probability_sum;
@@ -81,10 +81,10 @@ uint32_t get_probabilistic_simple_path(const char *buf, uint32_t max_paths, uint
   uint32_t path = 0;
   uint32_t accum = 0.0;
 
-  for (size_t i = 1; i < max_paths + 1; i++) {
+  for (size_t i = 15; i < max_paths + 15; i++) {
     accum += 0 | buf[i];
     if (random < accum) {
-      path = static_cast<uint32_t>(i - 1);
+      path = static_cast<uint32_t>(i - 15);
       break;
     }
   }
@@ -92,10 +92,20 @@ uint32_t get_probabilistic_simple_path(const char *buf, uint32_t max_paths, uint
 }
 
 uint32_t get_probabilitic_simple_max_paths(const char *buf, size_t s) {
-  uint32_t array_max = static_cast<uint32_t>(s - 1);
-  uint32_t meta_max = static_cast<uint32_t>(0 | buf[0]);
+  uint32_t array_max = static_cast<uint32_t>(s - 15);
+  uint32_t meta_max = static_cast<uint32_t>(0 | buf[14]);
   return array_max < meta_max ? array_max : meta_max;
 }
+
+/*
+4 bytes ipSrc
+4 bytes ipDest
+2 bytes totalLen
+4 bytes maxflowHandle
+4 bytes probabilityHandle
+
+18 bytes total
+*/
 
 struct probabilistic_simple_multipath {
   uint32_t operator()(const char *buf, size_t s) const {
