@@ -107,8 +107,19 @@ uint32_t get_probabilitic_simple_max_paths(const char *buf, size_t s) {
 18 bytes total
 */
 
+std::map<std::string, std::tuple<clock_t, uint32_t, double>> maxflow_map;
+
+void calculate_drop_rate(std::string route_id, std::string packet_size, std::string maxflow_handle) {
+
+}
+
 struct probabilistic_simple_multipath {
   uint32_t operator()(const char *buf, size_t s) const {
+    std::string route_id(buf, 8);
+    std::string packet_size(buf, 8, 2);
+    std::string maxflow_handle(buf, 10, 4);
+
+    calculate_drop_rate(route_id, packet_size, maxflow_handle);
     uint32_t max_paths = get_probabilitic_simple_max_paths(buf, s);
     uint32_t probability_sum = get_probabilistic_simple_sum(buf, max_paths);
     uint32_t random = rand() % probability_sum;
