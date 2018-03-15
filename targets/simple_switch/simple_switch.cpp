@@ -116,25 +116,27 @@ void calculate_drop_rate(std::string route_id, std::string packet_size, std::str
   } else {
     time_t state_time = std::get<0>(maxflow_map[route_id]);
     time_t current_time = time(0);
-    std::string myStr = maxflow_handle;
-    std::string packetSize = packet_size;
     if (difftime(current_time, state_time) >= 1.0) {
-      // double maxflow = (maxflow_handle[0] << 24) | (maxflow_handle[1] << 16) | (maxflow_handle[2] << 8) | maxflow_handle[3];
-      // double totalflow = std::get<1>(maxflow_map[route_id]) * 0.000008;
-      // double drop_rate = (totalflow / maxflow) - 1.0;
-      // maxflow_map[route_id] = std::make_tuple(time(0), 0, drop_rate);
+      double maxflow = (maxflow_handle[0] << 24) | (maxflow_handle[1] << 16) | (maxflow_handle[2] << 8) | maxflow_handle[3];
+      double totalflow = std::get<1>(maxflow_map[route_id]) * 0.000008;
+      double drop_rate = (totalflow / maxflow) - 1.0;
+      maxflow_map[route_id] = std::make_tuple(time(0), 0, drop_rate);
     } else {
-      // uint32_t total_length = std::get<1>(maxflow_map[route_id]);
-      // total_length += ((packet_size[0] << 8) | packet_size[1]);
+      uint32_t total_length = std::get<1>(maxflow_map[route_id]);
+      total_length += ((packet_size[0] << 8) | packet_size[1]);
     }
   }
 }
 
 struct probabilistic_simple_multipath {
   uint32_t operator()(const char *buf, size_t s) const {
-    std::string route_id(buf, 8);
-    std::string packet_size(buf, 8, 2);
-    std::string maxflow_handle(buf, 10, 4);
+    // std::string route_id(buf, 8);
+    // std::string packet_size(buf, 8, 2);
+    // std::string maxflow_handle(buf, 10, 4);
+
+    std::string route_id = "AAAA";
+    std::string packet_size = "AA";
+    std::string maxflow_handle = "AAAA";
 
     calculate_drop_rate(route_id, packet_size, maxflow_handle);
     uint32_t max_paths = get_probabilitic_simple_max_paths(buf, s);
