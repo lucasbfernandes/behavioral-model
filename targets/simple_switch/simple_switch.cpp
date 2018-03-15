@@ -114,17 +114,18 @@ void calculate_drop_rate(std::string route_id, std::string packet_size, std::str
   if (!maxflow_map.count(route_id)) {
     maxflow_map[route_id] = std::make_tuple(clock(), 0, 0.0);
   } else {
-    // clock_t state_clock = std::get<0>(maxflow_map[route_id]);
-    // clock_t current_clock = clock();
-    // if (((double)(current_clock - state_clock) / CLOCKS_PER_SEC) >= 1.0) {
-    //   double maxflow = (maxflow_handle[0] << 24) | (maxflow_handle[1] << 16) | (maxflow_handle[2] << 8) | maxflow_handle[3];
-    //   double totalflow = std::get<1>(maxflow_map[route_id]) * 0.000008;
-    //   double drop_rate = (totalflow / maxflow) - 1.0;
-    //   maxflow_map[route_id] = std::make_tuple(clock(), 0, drop_rate);
-    // } else {
-    //   uint32_t total_length = std::get<1>(maxflow_map[route_id]);
-    //   total_length += ((packet_size[0] << 8) | packet_size[1]);
-    // }
+    clock_t state_clock = std::get<0>(maxflow_map[route_id]);
+    clock_t current_clock = clock();
+    std::string myStr = maxflow_handle;
+    if (((double)(current_clock - state_clock) / CLOCKS_PER_SEC) >= 1.0) {
+      // double maxflow = (maxflow_handle[0] << 24) | (maxflow_handle[1] << 16) | (maxflow_handle[2] << 8) | maxflow_handle[3];
+      // double totalflow = std::get<1>(maxflow_map[route_id]) * 0.000008;
+      // double drop_rate = (totalflow / maxflow) - 1.0;
+      // maxflow_map[route_id] = std::make_tuple(clock(), 0, drop_rate);
+    } else {
+      uint32_t total_length = std::get<1>(maxflow_map[route_id]);
+      total_length += ((packet_size[0] << 8) | packet_size[1]);
+    }
   }
 }
 
