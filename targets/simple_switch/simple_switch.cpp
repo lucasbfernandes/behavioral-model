@@ -134,7 +134,7 @@ struct probabilistic_simple_multipath {
     std::string packet_size(buf, 8, 2);
     std::string maxflow_handle(buf, 10, 4);
 
-    calculate_drop_rate(route_id, packet_size, maxflow_handle);
+    // calculate_drop_rate(route_id, packet_size, maxflow_handle);
     uint32_t max_paths = get_probabilitic_simple_max_paths(buf, s);
     uint32_t probability_sum = get_probabilistic_simple_sum(buf, max_paths);
     uint32_t random = rand() % probability_sum;
