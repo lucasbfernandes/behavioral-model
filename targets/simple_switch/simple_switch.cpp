@@ -23,6 +23,7 @@
 #include <bm/bm_sim/logger.h>
 
 #include <unistd.h>
+#include <time.h>
 
 #include <iostream>
 #include <fstream>
@@ -110,7 +111,21 @@ uint32_t get_probabilitic_simple_max_paths(const char *buf, size_t s) {
 std::map<std::string, std::tuple<clock_t, uint32_t, double>> maxflow_map;
 
 void calculate_drop_rate(std::string route_id, std::string packet_size, std::string maxflow_handle) {
-
+  if (!maxflow_map.count(route_id)) {
+    maxflow_map[route_id] = std::make_tuple(clock(), 0, 0.0);
+  } else {
+    clock_t state_clock = std::get<0>(maxflow_map[route_id]);
+    clock_t current_clock = clock();
+    if (((double)(current_clock - state_clock) / CLOCKS_PER_SEC) >= 1.0) {
+      double maxflow = (0 | maxflow_handle);
+      double totalflow = std::get<1>(maxflow_map[route_id]) * 0.000008;
+      double drop_rate = (totalflow / maxflow) - 1.0;
+      maxflow_map[route_id] = std::make_tuple(clock(), 0, drop_rate);
+    } else {
+      uint32_t total_length = std::get<1>(maxflow_map[route_id]);
+      total_length += (0 | packet_size);
+    }
+  }
 }
 
 struct probabilistic_simple_multipath {
