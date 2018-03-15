@@ -124,7 +124,7 @@ void calculate_drop_rate(std::string route_id, std::string packet_size, std::str
       // double drop_rate = (totalflow / maxflow) - 1.0;
       // maxflow_map[route_id] = std::make_tuple(time(0), 0, drop_rate);
     } else {
-      uint32_t total_length = std::get<1>(maxflow_map[route_id]);
+      // uint32_t total_length = std::get<1>(maxflow_map[route_id]);
       // total_length += ((packet_size[0] << 8) | packet_size[1]);
     }
   }
