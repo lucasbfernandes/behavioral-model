@@ -136,6 +136,7 @@ struct probabilistic_simple_multipath {
     std::string bufStr(buf);
     std::cout << "Passou aqui" << std::endl;
     std::cout << "String " << bufStr << std::endl;
+    std::cout << "Size " << s << std::endl;
 
     std::string route_id = "AAAA";
     std::string packet_size = "AA";
