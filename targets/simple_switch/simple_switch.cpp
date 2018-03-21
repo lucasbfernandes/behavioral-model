@@ -134,8 +134,8 @@ struct probabilistic_simple_multipath {
     // std::string packet_size(buf, 8, 2);
     // std::string maxflow_handle(buf, 10, 4);
     std::string bufStr(buf);
-    BMLOG_DEBUG("Passou aqui");
-    BMLOG_DEBUG("String bufStr {}", bufStr);
+    std::cout << "Passou aqui" << std::endl;
+    std::cout << "String " << bufStr << std::endl;
 
     std::string route_id = "AAAA";
     std::string packet_size = "AA";
