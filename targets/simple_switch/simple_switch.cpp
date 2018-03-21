@@ -130,13 +130,15 @@ void calculate_drop_rate(std::string route_id, std::string packet_size, std::str
 
 struct probabilistic_simple_multipath {
   uint32_t operator()(const char *buf, size_t s) const {
-    // std::string route_id(buf, 8);
-    // std::string packet_size(buf, 8, 2);
-    // std::string maxflow_handle(buf, 10, 4);
     std::string bufStr(buf);
-    std::cout << "Passou aqui" << std::endl;
-    std::cout << "String " << bufStr << std::endl;
     std::cout << "Size " << s << std::endl;
+
+    std::string route_id(buf, 8);
+    std::cout << "route_id " << route_id << endl;
+    std::string packet_size(buf, 8, 2);
+    std::cout << "packet_size " << packet_size << endl;
+    std::string maxflow_handle(buf, 10, 4);
+    std::cout << "maxflow_handle " << maxflow_handle << endl;
 
     std::string route_id = "AAAA";
     std::string packet_size = "AA";
