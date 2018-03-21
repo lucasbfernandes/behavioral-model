@@ -31,6 +31,7 @@
 #include <vector>
 #include <map>
 #include <utility>
+#include <string.h>
 
 #include "simple_switch.h"
 
@@ -131,7 +132,9 @@ void calculate_drop_rate(std::string route_id, std::string packet_size, std::str
 struct probabilistic_simple_multipath {
   uint32_t operator()(const char *buf, size_t s) const {
     std::string bufStr(buf);
-    std::cout << "Size " << s << std::endl;
+    std::cout << "Size s " << s << std::endl;
+    std::cout << "Size buf " << strlen(buf) << std::endl;
+    std::cout << "Size bufStr " << bufStr.size() << std::endl;
 
     std::string route_id(buf, 8);
     std::cout << "route_id " << route_id << std::endl;
