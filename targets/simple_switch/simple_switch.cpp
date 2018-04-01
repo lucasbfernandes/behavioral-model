@@ -135,7 +135,7 @@ struct probabilistic_simple_multipath {
     std::cout << "Size s " << s << std::endl;
     std::cout << "Size buf " << strlen(buf) << std::endl;
     std::cout << "Size bufStr " << bufStr.size() << std::endl;
-    std::cout << "Second char " << 0 | buf[2] << std::endl;
+    std::cout << "Second char " << (0 | buf[2]) << std::endl;
 
     // std::string route_id(buf, 8);
     // std::cout << "route_id " << route_id << std::endl;
