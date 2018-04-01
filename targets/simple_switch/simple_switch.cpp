@@ -136,12 +136,12 @@ struct probabilistic_simple_multipath {
     std::cout << "Size buf " << strlen(buf) << std::endl;
     std::cout << "Size bufStr " << bufStr.size() << std::endl;
 
-    std::string route_id(buf, 8);
-    std::cout << "route_id " << route_id << std::endl;
-    std::string packet_size(buf, 8, 2);
-    std::cout << "packet_size " << packet_size << std::endl;
-    std::string maxflow_handle(buf, 10, 4);
-    std::cout << "maxflow_handle " << maxflow_handle << std::endl;
+    // std::string route_id(buf, 8);
+    // std::cout << "route_id " << route_id << std::endl;
+    // std::string packet_size(buf, 8, 2);
+    // std::cout << "packet_size " << packet_size << std::endl;
+    // std::string maxflow_handle(buf, 10, 4);
+    // std::cout << "maxflow_handle " << maxflow_handle << std::endl;
 
     route_id = "AAAA";
     packet_size = "AA";
