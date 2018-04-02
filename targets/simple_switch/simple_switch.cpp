@@ -124,14 +124,21 @@ void calculate_drop_rate(char* route_id, char* packet_size, char* maxflow_handle
   } else {
     std::cout << "Found maxflow_map match " << std::endl;
     double& total_length = std::get<1>(maxflow_map[route_id]);
-    total_length += ((unsigned char)(packet_size[0] << 8) | (unsigned char)packet_size[1]);
+
+    double packet_size0 = (unsigned char) packet_size[0];
+    double packet_size1 = (unsigned char) packet_size[1];
+    total_length += ((packet_size0 << 8) | packet_size1);
     time_t state_time = std::get<0>(maxflow_map[route_id]);
     time_t current_time = time(0);
     std::cout << "Total length: " << std::get<1>(maxflow_map[route_id]) << std::endl;
     std::cout << "Time difference: " << difftime(current_time, state_time) << " seconds " << std::endl;
     if (difftime(current_time, state_time) >= 1.0) {
       std::cout << ">= 1.0 second " << std::endl;
-      double maxflow = (maxflow_handle[0] << 24) | (maxflow_handle[1] << 16) | (maxflow_handle[2] << 8) | maxflow_handle[3];
+      double maxflow0 = (unsigned char) maxflow_handle[0];
+      double maxflow1 = (unsigned char) maxflow_handle[1];
+      double maxflow2 = (unsigned char) maxflow_handle[2];
+      double maxflow3 = (unsigned char) maxflow_handle[3];
+      double maxflow = (maxflow0 << 24) | (maxflow1 << 16) | (maxflow2 << 8) | maxflow3;
       double totalflow = std::get<1>(maxflow_map[route_id]) * 0.000008;
       double drop_rate = std::max((totalflow / maxflow) - 1.0, 0.0);
       std::cout << "Maxflow integer: " << maxflow << std::endl;
