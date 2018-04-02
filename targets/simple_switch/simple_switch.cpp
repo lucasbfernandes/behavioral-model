@@ -79,9 +79,15 @@ uint32_t get_probabilistic_simple_sum(const char *buf, size_t max_paths) {
   return probability_sum;
 }
 
-uint32_t get_probabilistic_simple_path(const char *buf, uint32_t max_paths, uint32_t random) {
+uint32_t get_probabilistic_simple_path(const char *buf, uint32_t max_paths, uint32_t random, char* route_id) {
   uint32_t path = 0;
   uint32_t accum = 0.0;
+
+  double drop_rate = std::get<2>(maxflow_map[route_id]);
+  uint32_t random = (rand() % 100) + 1;
+  if (drop_rate && random <= (drop_rate * 100.0)) {
+    return max_paths;
+  }
 
   for (size_t i = 15; i < max_paths + 15; i++) {
     accum += 0 | buf[i];
@@ -175,7 +181,7 @@ struct probabilistic_simple_multipath {
     uint32_t probability_sum = get_probabilistic_simple_sum(buf, max_paths);
     uint32_t random = rand() % probability_sum;
     std::cout << "-------------" << std::endl;
-    return get_probabilistic_simple_path(buf, max_paths, random);
+    return get_probabilistic_simple_path(buf, max_paths, random, route_id);
   }
 };
 
