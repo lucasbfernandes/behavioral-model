@@ -139,6 +139,7 @@ void calculate_drop_rate(char* route_id, char* packet_size, char* maxflow_handle
       std::cout << "New drop rate: " << drop_rate << std::endl;
       maxflow_map[route_id] = std::make_tuple(time(0), 0, drop_rate);
     }
+  }
 }
 
 struct probabilistic_simple_multipath {
