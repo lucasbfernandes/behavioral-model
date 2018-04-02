@@ -124,7 +124,7 @@ void calculate_drop_rate(char* route_id, char* packet_size, char* maxflow_handle
   } else {
     std::cout << "Found maxflow_map match " << std::endl;
     double& total_length = std::get<1>(maxflow_map[route_id]);
-    total_length += (unsigned int)((packet_size[0] << 8) | packet_size[1]);
+    total_length += ((unsigned char)(packet_size[0] << 8) | (unsigned char)packet_size[1]);
     time_t state_time = std::get<0>(maxflow_map[route_id]);
     time_t current_time = time(0);
     std::cout << "Total length: " << std::get<1>(maxflow_map[route_id]) << std::endl;
@@ -152,15 +152,15 @@ struct probabilistic_simple_multipath {
     memcpy(maxflow_handle, buf + 10, 4);
 
     std::cout << "route_id: " << std::endl;
-    for (int i = 0; i < 8; i++) std::cout << (unsigned int)route_id[i] << " ";
+    for (int i = 0; i < 8; i++) std::cout << (0 | (unsigned char)route_id[i]) << " ";
     std::cout << std::endl;
 
     std::cout << "packet_size: " << std::endl;
-    for (int i = 0; i < 2; i++) std::cout << (unsigned int)packet_size[i] << " ";
+    for (int i = 0; i < 2; i++) std::cout << (0 | (unsigned char)packet_size[i]) << " ";
     std::cout << std::endl;
 
     std::cout << "maxflow_handle: " << std::endl;
-    for (int i = 0; i < 4; i++) std::cout << (unsigned int)maxflow_handle[i] << " ";
+    for (int i = 0; i < 4; i++) std::cout << (0 | (unsigned char)maxflow_handle[i]) << " ";
     std::cout << std::endl;
 
     calculate_drop_rate(route_id, packet_size, maxflow_handle);
