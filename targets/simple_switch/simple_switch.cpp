@@ -110,7 +110,7 @@ uint32_t get_probabilitic_simple_max_paths(const char *buf, size_t s) {
 */
 
 struct cmp_str {
-   bool operator()(char* a, char* b) {
+   bool operator()(char* a, char* b) const {
       return std::strcmp(a, b) < 0;
    }
 };
