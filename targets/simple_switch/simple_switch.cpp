@@ -123,7 +123,7 @@ void calculate_drop_rate(char* route_id, char* packet_size, char* maxflow_handle
     maxflow_map[route_id] = std::make_tuple(time(0), 0, 0.0);
   } else {
     std::cout << "Found maxflow_map match " << std::endl;
-    uint32_t total_length = std::get<1>(maxflow_map[route_id]);
+    uint32_t& total_length = std::get<1>(maxflow_map[route_id]);
     total_length += ((packet_size[0] << 8) | packet_size[1]);
     time_t state_time = std::get<0>(maxflow_map[route_id]);
     time_t current_time = time(0);
