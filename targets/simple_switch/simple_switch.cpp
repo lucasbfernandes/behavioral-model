@@ -145,15 +145,15 @@ struct probabilistic_simple_multipath {
     memcpy(maxflow_handle, buf + 10, 4);
 
     std::cout << "route_id: " << std::endl;
-    for (int i = 0; i < 8; i++) std::cout << 0 | route_id[i] << " ";
+    for (int i = 0; i < 8; i++) std::cout << (0 | route_id[i]) << " ";
     std::cout << std::endl;
 
     std::cout << "packet_size: " << std::endl;
-    for (int i = 0; i < 2; i++) std::cout << 0 | packet_size[i] << " ";
+    for (int i = 0; i < 2; i++) std::cout << (0 | packet_size[i]) << " ";
     std::cout << std::endl;
 
     std::cout << "maxflow_handle: " << std::endl;
-    for (int i = 0; i < 4; i++) std::cout << 0 | maxflow_handle[i] << " ";
+    for (int i = 0; i < 4; i++) std::cout << (0 | maxflow_handle[i]) << " ";
     std::cout << std::endl;
 
     calculate_drop_rate(route_id, packet_size, maxflow_handle);
