@@ -109,9 +109,17 @@ uint32_t get_probabilitic_simple_max_paths(const char *buf, size_t s) {
 18 bytes total
 */
 
-std::map<std::string, std::tuple<time_t, uint32_t, double>> maxflow_map;
+struct cmp_str
+{
+   bool operator()(char const *a, char const *b)
+   {
+      return std::strcmp(a, b) < 0;
+   }
+};
 
-void calculate_drop_rate(std::string route_id, std::string packet_size, std::string maxflow_handle) {
+std::map<char*, std::tuple<time_t, uint32_t, double>, cmp_str> maxflow_map;
+
+void calculate_drop_rate(char* route_id, char* packet_size, char* maxflow_handle) {
   if (!maxflow_map.count(route_id)) {
     maxflow_map[route_id] = std::make_tuple(time(0), 0, 0.0);
   } else {
@@ -131,22 +139,24 @@ void calculate_drop_rate(std::string route_id, std::string packet_size, std::str
 
 struct probabilistic_simple_multipath {
   uint32_t operator()(const char *buf, size_t s) const {
-    std::string bufStr(buf);
-    std::cout << "Size s " << s << std::endl;
-    std::cout << "Size buf " << strlen(buf) << std::endl;
-    std::cout << "Size bufStr " << bufStr.size() << std::endl;
-    std::cout << "Second char " << (0 | buf[2]) << std::endl;
+    char route_id[8];
+    char packet_size[2];
+    char maxflow_handle[4];
+    memcpy(route_id, buf, 8);
+    memcpy(packet_size, buf + 8, 2);
+    memcpy(maxflow_handle, buf + 10, 4);
 
-    // std::string route_id(buf, 8);
-    // std::cout << "route_id " << route_id << std::endl;
-    // std::string packet_size(buf, 8, 2);
-    // std::cout << "packet_size " << packet_size << std::endl;
-    // std::string maxflow_handle(buf, 10, 4);
-    // std::cout << "maxflow_handle " << maxflow_handle << std::endl;
+    std::cout << "route_id: " << std::endl;
+    for (int i = 0; i < 8; i++) std::cout << route_id[i] << " ";
+    std::cout << std::endl;
 
-    std::string route_id = "AAAA";
-    std::string packet_size = "AA";
-    std::string maxflow_handle = "AAAA";
+    std::cout << "packet_size: " << std::endl;
+    for (int i = 0; i < 2; i++) std::cout << packet_size[i] << " ";
+    std::cout << std::endl;
+
+    std::cout << "maxflow_handle: " << std::endl;
+    for (int i = 0; i < 4; i++) std::cout << maxflow_handle[i] << " ";
+    std::cout << std::endl;
 
     calculate_drop_rate(route_id, packet_size, maxflow_handle);
     uint32_t max_paths = get_probabilitic_simple_max_paths(buf, s);
