@@ -79,13 +79,15 @@ uint32_t get_probabilistic_simple_sum(const char *buf, size_t max_paths) {
   return probability_sum;
 }
 
+std::map<char*, std::tuple<time_t, double, double>, cmp_str> maxflow_map;
+
 uint32_t get_probabilistic_simple_path(const char *buf, uint32_t max_paths, uint32_t random, char* route_id) {
   uint32_t path = 0;
   uint32_t accum = 0.0;
 
   double drop_rate = std::get<2>(maxflow_map[route_id]);
-  uint32_t random = (rand() % 100) + 1;
-  if (drop_rate && random <= (drop_rate * 100.0)) {
+  uint32_t drop_random = (rand() % 100) + 1;
+  if (drop_rate && drop_random <= (drop_rate * 100.0)) {
     return max_paths;
   }
 
@@ -120,8 +122,6 @@ struct cmp_str {
       return std::strcmp(a, b) < 0;
    }
 };
-
-std::map<char*, std::tuple<time_t, double, double>, cmp_str> maxflow_map;
 
 void calculate_drop_rate(char* route_id, char* packet_size, char* maxflow_handle) {
   if (!maxflow_map.count(route_id)) {
