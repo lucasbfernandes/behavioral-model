@@ -88,6 +88,12 @@ struct cmp_str {
 std::map<char*, std::tuple<time_t, double, double>, cmp_str> maxflow_map;
 double droppedPackets = 0;
 
+double getPacketTotalLengthValue(char* packet_size) {
+  long long packet_size0 = (unsigned char) packet_size[0];
+  long long packet_size1 = (unsigned char) packet_size[1];
+  return ((packet_size0 << 8) | packet_size1);
+}
+
 uint32_t getProbabilisticSimplePath(const char *buf, uint32_t max_paths, uint32_t random, char* route_id, char* packet_size) {
   uint32_t path = 0;
   uint32_t accum = 0.0;
@@ -114,12 +120,6 @@ uint32_t getProbabilisticSimpleMaxPaths(const char *buf, size_t s) {
   uint32_t array_max = static_cast<uint32_t>(s - 15);
   uint32_t meta_max = static_cast<uint32_t>(0 | buf[14]);
   return array_max < meta_max ? array_max : meta_max;
-}
-
-double getPacketTotalLengthValue(char* packet_size) {
-  long long packet_size0 = (unsigned char) packet_size[0];
-  long long packet_size1 = (unsigned char) packet_size[1];
-  return ((packet_size0 << 8) | packet_size1);
 }
 
 double getMaxflowValue(char* maxflow_handle) {
