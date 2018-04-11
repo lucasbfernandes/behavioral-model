@@ -87,7 +87,7 @@ struct cmp_str {
 
 std::map<char*, std::tuple<time_t, double, double>, cmp_str> maxflow_map;
 
-uint32_t get_probabilistic_simple_path(const char *buf, uint32_t max_paths, uint32_t random, char* route_id) {
+uint32_t getProbabilisticSimplePath(const char *buf, uint32_t max_paths, uint32_t random, char* route_id) {
   uint32_t path = 0;
   uint32_t accum = 0.0;
 
@@ -107,52 +107,53 @@ uint32_t get_probabilistic_simple_path(const char *buf, uint32_t max_paths, uint
   return path;
 }
 
-uint32_t get_probabilitic_simple_max_paths(const char *buf, size_t s) {
+uint32_t getProbabilisticSimpleMaxPaths(const char *buf, size_t s) {
   uint32_t array_max = static_cast<uint32_t>(s - 15);
   uint32_t meta_max = static_cast<uint32_t>(0 | buf[14]);
   return array_max < meta_max ? array_max : meta_max;
 }
 
-/*
-4 bytes ipSrc
-4 bytes ipDest
-2 bytes totalLen
-4 bytes maxflowHandle
-4 bytes probabilityHandle
+double getPacketTotalLengthValue(char* packet_size) {
+  long long packet_size0 = (unsigned char) packet_size[0];
+  long long packet_size1 = (unsigned char) packet_size[1];
+  return ((packet_size0 << 8) | packet_size1);
+}
 
-18 bytes total
-*/
+double getMaxflowValue(char* maxflow_handle) {
+  long long maxflow0 = (unsigned char) maxflow_handle[0];
+  long long maxflow1 = (unsigned char) maxflow_handle[1];
+  long long maxflow2 = (unsigned char) maxflow_handle[2];
+  long long maxflow3 = (unsigned char) maxflow_handle[3];
+  return (maxflow0 << 24) | (maxflow1 << 16) | (maxflow2 << 8) | maxflow3;
+}
 
-void calculate_drop_rate(char* route_id, char* packet_size, char* maxflow_handle) {
-  if (!maxflow_map.count(route_id)) {
-    std::cout << "No maxflow_map match " << std::endl;
-    maxflow_map[route_id] = std::make_tuple(time(0), 0.0, 0.0);
-  } else {
-    std::cout << "Found maxflow_map match " << std::endl;
-    double& total_length = std::get<1>(maxflow_map[route_id]);
+void computePacketTotalLength(char* route_id) {
+  double& total_length = std::get<1>(maxflow_map[route_id]);
+  total_length += getPacketTotalLengthValue(packet_size);
+}
 
-    long long packet_size0 = (unsigned char) packet_size[0];
-    long long packet_size1 = (unsigned char) packet_size[1];
-    total_length += ((packet_size0 << 8) | packet_size1);
-    time_t state_time = std::get<0>(maxflow_map[route_id]);
-    time_t current_time = time(0);
-    std::cout << "Total length: " << std::get<1>(maxflow_map[route_id]) << std::endl;
-    std::cout << "Time difference: " << difftime(current_time, state_time) << " seconds " << std::endl;
-    if (difftime(current_time, state_time) >= 1.0) {
-      std::cout << ">= 1.0 second " << std::endl;
-      long long maxflow0 = (unsigned char) maxflow_handle[0];
-      long long maxflow1 = (unsigned char) maxflow_handle[1];
-      long long maxflow2 = (unsigned char) maxflow_handle[2];
-      long long maxflow3 = (unsigned char) maxflow_handle[3];
-      double maxflow = (maxflow0 << 24) | (maxflow1 << 16) | (maxflow2 << 8) | maxflow3;
-      double totalflow = std::get<1>(maxflow_map[route_id]) * 0.000008;
-      double drop_rate = std::max((totalflow / maxflow) - 1.0, 0.0);
-      std::cout << "Maxflow integer: " << maxflow << std::endl;
-      std::cout << "Totalflow integer: " << totalflow << std::endl;
-      std::cout << "New drop rate: " << drop_rate << std::endl;
-      maxflow_map[route_id] = std::make_tuple(time(0), 0.0, drop_rate);
-    }
+double getPacketDropRate(char* maxflow_handle, char* route_id) {
+  double maxflow = getMaxflowValue(maxflow_handle);
+  double totalflow = std::get<1>(maxflow_map[route_id]) * 0.000008;
+  return std::max((totalflow / maxflow) - 1.0, 0.0);
+}
+
+void computePacketDropRate(char* route_id, char* packet_size, char* maxflow_handle) {
+  computePacketTotalLength(route_id);
+  if (difftime(time(0), std::get<0>(maxflow_map[route_id])) >= 1.0) {
+    double drop_rate = getPacketDropRate(maxflow_handle, route_id);
+    maxflow_map[route_id] = std::make_tuple(time(0), 0.0, drop_rate);
   }
+}
+
+void insertDefaultMaxflowEntry(char* route_id) {
+  maxflow_map[route_id] = std::make_tuple(time(0), 0.0, 0.0);
+}
+
+void calculateDropRate(char* route_id, char* packet_size, char* maxflow_handle) {
+  !maxflow_map.count(route_id) ?
+    insertDefaultMaxflowEntry(route_id) :
+    computePacketDropRate(route_id, packet_size, maxflow_handle);
 }
 
 struct probabilistic_simple_multipath {
@@ -164,24 +165,11 @@ struct probabilistic_simple_multipath {
     memcpy(packet_size, buf + 8, 2);
     memcpy(maxflow_handle, buf + 10, 4);
 
-    std::cout << "route_id: " << std::endl;
-    for (int i = 0; i < 8; i++) std::cout << (0 | (unsigned char)route_id[i]) << " ";
-    std::cout << std::endl;
-
-    std::cout << "packet_size: " << std::endl;
-    for (int i = 0; i < 2; i++) std::cout << (0 | (unsigned char)packet_size[i]) << " ";
-    std::cout << std::endl;
-
-    std::cout << "maxflow_handle: " << std::endl;
-    for (int i = 0; i < 4; i++) std::cout << (0 | (unsigned char)maxflow_handle[i]) << " ";
-    std::cout << std::endl;
-
-    calculate_drop_rate(route_id, packet_size, maxflow_handle);
-    uint32_t max_paths = get_probabilitic_simple_max_paths(buf, s);
+    calculateDropRate(route_id, packet_size, maxflow_handle);
+    uint32_t max_paths = getProbabilisticSimpleMaxPaths(buf, s);
     uint32_t probability_sum = get_probabilistic_simple_sum(buf, max_paths);
     uint32_t random = rand() % probability_sum;
-    std::cout << "-------------" << std::endl;
-    return get_probabilistic_simple_path(buf, max_paths, random, route_id);
+    return getProbabilisticSimplePath(buf, max_paths, random, route_id);
   }
 };
 
