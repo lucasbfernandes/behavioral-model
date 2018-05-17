@@ -86,7 +86,10 @@ struct cmp_str {
 };
 
 std::map<char*, std::tuple<time_t, double, double>, cmp_str> maxflow_map;
+double droppedAmount = 0;
 double droppedPackets = 0;
+double totalPassed = 0;
+double currentSecond = 0;
 
 double getPacketTotalLengthValue(char* packet_size) {
   long long packet_size0 = (unsigned char) packet_size[0];
@@ -101,10 +104,11 @@ uint32_t getProbabilisticSimplePath(const char *buf, uint32_t max_paths, uint32_
   double drop_rate = std::get<2>(maxflow_map[route_id]);
   uint32_t drop_random = (rand() % 100) + 1;
   if (drop_rate && drop_random <= (drop_rate * 100.0)) {
-    droppedPackets += getPacketTotalLengthValue(packet_size);
-    std::cout << "Dropped packet. Size: " << getPacketTotalLengthValue(packet_size) << std::endl;
+    droppedAmount += getPacketTotalLengthValue(packet_size);
+    droppedPackets++;
     return max_paths;
   }
+  totalPassed += getPacketTotalLengthValue(packet_size);
 
   for (size_t i = 15; i < max_paths + 15; i++) {
     accum += 0 | buf[i];
@@ -138,17 +142,28 @@ void computePacketTotalLength(char* route_id, char* packet_size) {
 double getPacketDropRate(char* maxflow_handle, char* route_id) {
   double maxflow = getMaxflowValue(maxflow_handle);
   double totalflow = std::get<1>(maxflow_map[route_id]) * 0.000008;
-  std::cout << "Maxflow value: " << maxflow << std::endl;
-  std::cout << "Totalflow value: " << totalflow << std::endl;
   return std::max(1.0 - (maxflow / totalflow), 0.0);
 }
 
 void computePacketDropRate(char* route_id, char* packet_size, char* maxflow_handle) {
   computePacketTotalLength(route_id, packet_size);
   if (difftime(time(0), std::get<0>(maxflow_map[route_id])) >= 1.0) {
+
+    std::cout << "--------------------" << std::endl << std::endl;
+    std::cout << "Time frame: " << currentSecond << " - " << currentSecond + 1 << std::endl;
+    std::cout << "Maxflow: " << getMaxflowValue(maxflow_handle) << std::endl;
+    std::cout << "Totalflow: " << std::get<1>(maxflow_map[route_id]) << std::endl;
+    std::cout << "Drop rate: " << std::get<2>(maxflow_map[route_id]) << std::endl;
+    std::cout << "Packets dropped: " << droppedPackets << std::endl;
+    std::cout << "Total dropped: " << droppedAmount << std::endl;
+    std::cout << "Total passed: " << totalPassed << std::endl << std::endl;
+
+    currentSecond++;
+    droppedPackets = 0;
+    droppedAmount = 0;
+    totalPassed = 0;
+
     double drop_rate = getPacketDropRate(maxflow_handle, route_id);
-    std::cout << "New drop rate: " << drop_rate << std::endl;
-    std::cout << "Dropped amount so far: " << droppedPackets << std::endl;
     maxflow_map[route_id] = std::make_tuple(time(0), 0.0, drop_rate);
   }
 }
