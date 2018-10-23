@@ -376,7 +376,7 @@ OptionsParser::parse(int argc, char *argv[], TargetParserIface *tp) {
   }
 
   if (tp) {
-    std::cout << "Calling target program-options parser\n";
+    // std::cout << "Calling target program-options parser\n";
     if (tp->parse(to_pass_further, &std::cout)) {
       std::cout << "Target parser returned an error\n";
     }

@@ -186,7 +186,7 @@ PacketDispatcherIface::ReturnCode
 DevMgr::port_add(const std::string &iface_name, port_t port_num,
                  const char *pcap_in, const char *pcap_out) {
   assert(pimp);
-  BMLOG_DEBUG("Adding interface {} as port {}", iface_name, port_num);
+  // BMLOG_DEBUG("Adding interface {} as port {}", iface_name, port_num);
   ReturnCode rc = pimp->port_add(iface_name, port_num, pcap_in, pcap_out);
   if (rc != ReturnCode::SUCCESS)
     Logger::get()->error("Add port operation failed");
