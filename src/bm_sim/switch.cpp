@@ -239,10 +239,10 @@ SwitchWContexts::init_from_command_line_options(
     set_dev_mgr_bmi(device_id, transport);
 
   for (const auto &iface : parser.ifaces) {
-    std::cout << "Adding interface " << iface.second
+    /*std::cout << "Adding interface " << iface.second
               << " as port " << iface.first
               << (parser.use_files ? " (files)" : "")
-              << std::endl;
+              << std::endl;*/
 
     const char* inFileName = NULL;
     const char* outFileName = NULL;

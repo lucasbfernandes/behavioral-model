@@ -144,7 +144,7 @@ int serve(int port) {
 int start_server(bm::SwitchWContexts *sw, int port) {
   switch_ = sw;
   std::thread server_thread(serve, port);
-  printf("Thrift server was started\n");
+  //printf("Thrift server was started\n");
   std::unique_lock<std::mutex> lock(m_ready);
   while(!ready) cv_ready.wait(lock);
   server_thread.detach();
