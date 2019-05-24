@@ -149,7 +149,7 @@ void computePacketDropRate(char* route_id, char* packet_size, char* maxflow_hand
   computePacketTotalLength(route_id, packet_size);
   // std::cout << getPacketTotalLengthValue(packet_size) << std::endl;
   if (difftime(time(0), std::get<0>(maxflow_map[route_id])) >= 0.5) {
-
+    std::cout << difftime(time(0), std::get<0>(maxflow_map[route_id])) << std::endl;
     std::cout << currentSecond + 1 << ";"; // Seconds
     std::cout << getMaxflowValue(maxflow_handle) << ";"; // Maxflow
     std::cout << std::get<1>(maxflow_map[route_id]) << ";"; // Totalflow
