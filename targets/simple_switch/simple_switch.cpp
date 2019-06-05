@@ -32,6 +32,7 @@
 #include <map>
 #include <utility>
 #include <string.h>
+#include <random>
 
 #include "simple_switch.h"
 
@@ -97,13 +98,20 @@ double getPacketTotalLengthValue(char* packet_size) {
   return ((packet_size0 << 8) | packet_size1);
 }
 
+double getRandomDouble() {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<> dis(0.0, 1.0);
+  return dis(gen);
+}
+
 uint32_t getProbabilisticSimplePath(const char *buf, uint32_t max_paths, uint32_t random, char* route_id, char* packet_size) {
   uint32_t path = 0;
   uint32_t accum = 0.0;
 
   double drop_rate = std::get<2>(maxflow_map[route_id]);
-  uint32_t drop_random = (rand() % 100) + 1;
-  if (drop_rate && drop_random <= (drop_rate * 100.0)) {
+  uint32_t drop_random = getRandomDouble();
+  if (drop_rate && drop_random <= drop_rate) {
     droppedAmount += getPacketTotalLengthValue(packet_size);
     droppedPackets++;
     return max_paths;
