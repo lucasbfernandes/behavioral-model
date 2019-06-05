@@ -111,6 +111,10 @@ uint32_t getProbabilisticSimplePath(const char *buf, uint32_t max_paths, uint32_
 
   double drop_rate = std::get<2>(maxflow_map[route_id]);
   uint32_t drop_random = getRandomDouble();
+
+  std::cout << drop_random << ';';
+  std::cout << drop_rate << std::endl;
+
   if (drop_rate && drop_random <= drop_rate) {
     droppedAmount += getPacketTotalLengthValue(packet_size);
     droppedPackets++;
@@ -158,13 +162,13 @@ void computePacketDropRate(char* route_id, char* packet_size, char* maxflow_hand
   // std::cout << getPacketTotalLengthValue(packet_size) << std::endl;
   if (difftime(time(0), std::get<0>(maxflow_map[route_id])) >= 1.0) {
 
-    std::cout << currentSecond + 1 << ";"; // Seconds
-    std::cout << getMaxflowValue(maxflow_handle) << ";"; // Maxflow
-    std::cout << std::get<1>(maxflow_map[route_id]) << ";"; // Totalflow
-    std::cout << std::get<2>(maxflow_map[route_id]) << ";"; // Drop rate:
-    std::cout << droppedPackets << ";"; // Packets dropped
-    std::cout << droppedAmount << ";"; // Total dropped
-    std::cout << totalPassed << std::endl; // Total passed
+    // std::cout << currentSecond + 1 << ";"; // Seconds
+    // std::cout << getMaxflowValue(maxflow_handle) << ";"; // Maxflow
+    // std::cout << std::get<1>(maxflow_map[route_id]) << ";"; // Totalflow
+    // std::cout << std::get<2>(maxflow_map[route_id]) << ";"; // Drop rate:
+    // std::cout << droppedPackets << ";"; // Packets dropped
+    // std::cout << droppedAmount << ";"; // Total dropped
+    // std::cout << totalPassed << std::endl; // Total passed
 
     currentSecond++;
     droppedPackets = 0;
