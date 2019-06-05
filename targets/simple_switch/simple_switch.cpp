@@ -110,7 +110,7 @@ uint32_t getProbabilisticSimplePath(const char *buf, uint32_t max_paths, uint32_
   uint32_t accum = 0.0;
 
   double drop_rate = std::get<2>(maxflow_map[route_id]);
-  uint32_t drop_random = getRandomDouble();
+  double drop_random = getRandomDouble();
 
   std::cout << drop_random << ';';
   std::cout << drop_rate << std::endl;
